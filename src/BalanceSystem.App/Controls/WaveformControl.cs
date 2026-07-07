@@ -10,7 +10,7 @@ public class WaveformControl : FrameworkElement
     private WriteableBitmap? _bitmap;
     private readonly Queue<double> _channel1Data = new();
     private readonly Queue<double> _channel2Data = new();
-    private const int MaxPoints = 6400 * 5;
+    private static readonly int MaxPoints = (int)BalanceSystem.Shared.Constants.DefaultSampleRate * 5;
     private readonly object _dataLock = new();
 
     public static readonly DependencyProperty Channel1ColorProperty =

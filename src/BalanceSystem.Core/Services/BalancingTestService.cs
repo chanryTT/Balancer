@@ -12,6 +12,7 @@ public class BalancingTestService : IBalancingTestService
     private readonly ILogger<BalancingTestService> _logger;
     private readonly InfluenceCoefficientSolver _solver = new();
     private readonly Queue<StabilitySample> _stabilityWindow = new();
+    private readonly List<double> _phaseBuffer = new();
     private double _targetSpeed;
 
     public TestStep CurrentStep { get; private set; } = TestStep.Idle;
@@ -48,8 +49,8 @@ public class BalancingTestService : IBalancingTestService
         var leftSignal = waveform.Select(d => d.LeftChannel).ToArray();
         var rightSignal = waveform.Select(d => d.RightChannel).ToArray();
 
-        var (leftAmp, leftPhase) = FftCalculator.ExtractFundamental(leftSignal, 6400.0, speed);
-        var (rightAmp, rightPhase) = FftCalculator.ExtractFundamental(rightSignal, 6400.0, speed);
+        var (leftAmp, leftPhase) = FftCalculator.ExtractFundamental(leftSignal, Constants.DefaultSampleRate, speed);
+        var (rightAmp, rightPhase) = FftCalculator.ExtractFundamental(rightSignal, Constants.DefaultSampleRate, speed);
 
         switch (CurrentStep)
         {
@@ -106,6 +107,7 @@ public class BalancingTestService : IBalancingTestService
         IsStable = false;
         Result = null;
         _stabilityWindow.Clear();
+        _phaseBuffer.Clear();
         StepChanged?.Invoke(this, CurrentStep);
     }
 
@@ -126,8 +128,14 @@ public class BalancingTestService : IBalancingTestService
 
     private void OnDataReceived(object? sender, VibrationData data)
     {
-        _stabilityWindow.Enqueue(new StabilitySample(data.Speed, data.LeftChannel,
-            data.LeftChannel));
+        // Maintain a rolling buffer for phase estimation
+        _phaseBuffer.Add(data.LeftChannel);
+        while (_phaseBuffer.Count > 1024)
+            _phaseBuffer.RemoveAt(0);
+
+        double phase = EstimatePhaseFromBuffer(data.Speed);
+
+        _stabilityWindow.Enqueue(new StabilitySample(data.Speed, data.LeftChannel, phase));
         while (_stabilityWindow.Count > 100)
             _stabilityWindow.Dequeue();
 
@@ -148,6 +156,31 @@ public class BalancingTestService : IBalancingTestService
             if (wasStable != IsStable)
                 StabilityChanged?.Invoke(this, IsStable);
         }
+    }
+
+    /// <summary>
+    /// Estimates the vibration phase at the fundamental frequency using a
+    /// lightweight single-bin DFT correlation on the rolling phase buffer.
+    /// </summary>
+    private double EstimatePhaseFromBuffer(double speed)
+    {
+        if (_phaseBuffer.Count < 64 || speed < 1) return 0;
+
+        double freq = speed / 60.0;
+        double sampleRate = Constants.DefaultSampleRate;
+        double sumSin = 0, sumCos = 0;
+        int n = Math.Min(_phaseBuffer.Count, 1024);
+        int offset = _phaseBuffer.Count - n;
+        for (int i = 0; i < n; i++)
+        {
+            double angle = 2 * Math.PI * freq * i / sampleRate;
+            double sample = _phaseBuffer[offset + i];
+            sumSin += sample * Math.Sin(angle);
+            sumCos += sample * Math.Cos(angle);
+        }
+        double phase = Math.Atan2(sumSin, sumCos) * 180.0 / Math.PI;
+        if (phase < 0) phase += 360.0;
+        return phase;
     }
 
     private static double StdDev(double[] values)

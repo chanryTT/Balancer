@@ -1,6 +1,7 @@
 using System.Globalization;
 using BalanceSystem.Core.Interfaces;
 using BalanceSystem.Core.Models;
+using BalanceSystem.Shared;
 using Microsoft.Extensions.Logging;
 
 namespace BalanceSystem.Infrastructure.DataAcquisition;
@@ -105,7 +106,7 @@ public class CsvSimulationService : IDataAcquisitionService, IDisposable
 
     public VibrationData[] GetWaveformData(int windowSeconds = 5)
     {
-        int sampleCount = (int)(6400 * windowSeconds);
+        int sampleCount = (int)(Constants.DefaultSampleRate * windowSeconds);
         lock (_bufferLock)
         {
             return _buffer.TakeLast(sampleCount).ToArray();
@@ -140,7 +141,7 @@ public class CsvSimulationService : IDataAcquisitionService, IDisposable
             lock (_bufferLock)
             {
                 _buffer.Add(data);
-                while (_buffer.Count > 6400 * 10)
+                while (_buffer.Count > (int)Constants.DefaultSampleRate * 10)
                     _buffer.RemoveAt(0);
             }
 
@@ -175,7 +176,7 @@ public class CsvSimulationService : IDataAcquisitionService, IDisposable
     {
         if (samples.Length < 100 || speed < 1) return 0;
         double freq = speed / 60.0;
-        double sampleRate = 6400.0;
+        double sampleRate = Constants.DefaultSampleRate;
         double sumSin = 0, sumCos = 0;
         int n = Math.Min(samples.Length, 4096);
         for (int i = 0; i < n; i++)

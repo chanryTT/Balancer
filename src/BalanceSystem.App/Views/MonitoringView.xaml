@@ -64,7 +64,11 @@
                         </Grid.RowDefinitions>
                         <TextBlock Grid.Row="0" Text="Polar Plot" FontSize="13"
                                    FontWeight="SemiBold" Foreground="#333333" Margin="8,6"/>
-                        <controls:PolarPlotControl x:Name="PolarPlot" Grid.Row="1"/>
+                        <controls:PolarPlotControl x:Name="PolarPlot" Grid.Row="1"
+                            LeftVectorMagnitude="{Binding LeftVectorMagnitude}"
+                            LeftVectorAngle="{Binding LeftVectorAngle}"
+                            RightVectorMagnitude="{Binding RightVectorMagnitude}"
+                            RightVectorAngle="{Binding RightVectorAngle}"/>
                     </Grid>
                 </Border>
             </Grid>

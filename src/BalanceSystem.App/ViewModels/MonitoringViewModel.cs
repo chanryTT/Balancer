@@ -21,6 +21,15 @@ public partial class MonitoringViewModel : ObservableObject
     [ObservableProperty] private string _stabilityStatusText = "等待数据...";
     [ObservableProperty] private int _selectedSpeedIndex = 2;
 
+    // Polar plot vector properties (Fix 5)
+    [ObservableProperty] private double _leftVectorMagnitude;
+    [ObservableProperty] private double _leftVectorAngle;
+    [ObservableProperty] private double _rightVectorMagnitude;
+    [ObservableProperty] private double _rightVectorAngle;
+
+    // Latest vibration sample for waveform rendering (Fix 2)
+    [ObservableProperty] private Core.Models.VibrationData? _latestData;
+
     public int[] SpeedOptions => Constants.SpeedOptions;
 
     public MonitoringViewModel(IDataAcquisitionService dataAcquisition)
@@ -35,6 +44,7 @@ public partial class MonitoringViewModel : ObservableObject
         Application.Current.Dispatcher.BeginInvoke(() =>
         {
             Speed = data.Speed;
+            LatestData = data;
         });
     }
 
@@ -59,6 +69,12 @@ public partial class MonitoringViewModel : ObservableObject
             RightPhase = rightPhase;
             IsStable = isStable;
             StabilityStatusText = isStable ? "稳定" : "不稳定";
+
+            // Polar plot vector binding (Fix 5)
+            LeftVectorMagnitude = leftAmp;
+            LeftVectorAngle = leftPhase;
+            RightVectorMagnitude = rightAmp;
+            RightVectorAngle = rightPhase;
         });
     }
 

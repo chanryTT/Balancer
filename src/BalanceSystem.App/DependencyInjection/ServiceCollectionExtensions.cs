@@ -24,6 +24,9 @@ public static class ServiceCollectionExtensions
 
         services.AddSingleton<IDataAcquisitionService, CsvSimulationService>();
 
+        // TODO: Phase 2 — register real hardware speed measurement service
+        // services.AddSingleton<ISpeedMeasurementService, HardwareSpeedMeasurementService>();
+
         // ViewModels
         services.AddSingleton<ViewModels.MonitoringViewModel>();
         services.AddSingleton<ViewModels.BalancingTestViewModel>();
