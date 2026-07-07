@@ -42,6 +42,12 @@ public class BalancingTestService : IBalancingTestService
 
     public void RecordCurrentValues()
     {
+        // Fallback: use hardcoded 50g@0° for backward compatibility
+        RecordCurrentValues(trialMass: 50, trialAngle: 0);
+    }
+
+    public void RecordCurrentValues(double trialMass, double trialAngle)
+    {
         var waveform = _dataAcquisition.GetWaveformData(1);
         if (waveform.Length < 100) return;
 
@@ -60,20 +66,35 @@ public class BalancingTestService : IBalancingTestService
                     leftAmp, leftPhase, rightAmp, rightPhase);
                 break;
             case TestStep.LeftTrial:
-                _solver.AddLeftTrialRun(leftAmp, leftPhase, rightAmp, rightPhase,
-                    trialMass: 50, trialAngle: 0);
-                _logger.LogInformation("Left trial recorded");
+                _solver.AddLeftTrialRun(leftAmp, leftPhase, rightAmp, rightPhase, trialMass, trialAngle);
+                _logger.LogInformation("Left trial recorded: mass={M}g, angle={A}°", trialMass, trialAngle);
                 break;
             case TestStep.RightTrial:
-                _solver.AddRightTrialRun(leftAmp, leftPhase, rightAmp, rightPhase,
-                    trialMass: 50, trialAngle: 0);
-                _logger.LogInformation("Right trial recorded");
+                _solver.AddRightTrialRun(leftAmp, leftPhase, rightAmp, rightPhase, trialMass, trialAngle);
+                _logger.LogInformation("Right trial recorded: mass={M}g, angle={A}°", trialMass, trialAngle);
                 break;
             case TestStep.Retest:
                 _logger.LogInformation("Retest recorded: L={LA:F2} angle {LP:F1}, R={RA:F2} angle {RP:F1}",
                     leftAmp, leftPhase, rightAmp, rightPhase);
                 break;
         }
+    }
+
+    public void RecordCurrentValues(Recipe recipe)
+    {
+        double trialMass = CurrentStep switch
+        {
+            TestStep.LeftTrial => recipe.TrialMass1,
+            TestStep.RightTrial => recipe.TrialMass2,
+            _ => 50
+        };
+        double trialAngle = CurrentStep switch
+        {
+            TestStep.LeftTrial => recipe.TrialAngle1,
+            TestStep.RightTrial => recipe.TrialAngle2,
+            _ => 0
+        };
+        RecordCurrentValues(trialMass, trialAngle);
     }
 
     public void AdvanceStep()

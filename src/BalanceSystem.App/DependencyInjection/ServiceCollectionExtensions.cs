@@ -29,20 +29,18 @@ public static class ServiceCollectionExtensions
         // TODO: Phase 2 — register real hardware speed measurement service
         // services.AddSingleton<ISpeedMeasurementService, HardwareSpeedMeasurementService>();
 
-        // Business services
-        services.AddSingleton<BalanceSystem.Core.Services.IBalancingTestService,
-                               BalanceSystem.Core.Services.BalancingTestService>();
-
-        // Phase 2 — Data management services
+        // Business services (register before ViewModels that depend on them)
         services.AddSingleton<IRecipeService, RecipeService>();
         services.AddSingleton<ITestRecordService, TestRecordService>();
         services.AddSingleton<TestReportService>();
+        services.AddSingleton<BalanceSystem.Core.Services.IBalancingTestService,
+                               BalanceSystem.Core.Services.BalancingTestService>();
 
-        // ViewModels
-        services.AddSingleton<ViewModels.MonitoringViewModel>();
-        services.AddSingleton<ViewModels.BalancingTestViewModel>();
+        // ViewModels (must come after their dependencies)
         services.AddSingleton<ViewModels.RecipeManagementViewModel>();
         services.AddSingleton<ViewModels.HistoryViewModel>();
+        services.AddSingleton<ViewModels.MonitoringViewModel>();
+        services.AddSingleton<ViewModels.BalancingTestViewModel>();
         services.AddSingleton<ViewModels.MainViewModel>();
 
         return services;

@@ -184,6 +184,12 @@
         <!-- Speed selector -->
         <Border Grid.Row="3" Background="#F5F5F5" Padding="10" Margin="0,10,0,0">
             <StackPanel Orientation="Horizontal">
+                <TextBlock Text="Recipe:" FontSize="12" Foreground="#666"
+                           VerticalAlignment="Center" Margin="0,0,10,0"/>
+                <ComboBox ItemsSource="{Binding Recipes}"
+                          SelectedItem="{Binding SelectedRecipe}"
+                          DisplayMemberPath="Name"
+                          Width="130" Height="24" FontSize="12" Margin="0,0,10,0"/>
                 <TextBlock Text="Speed:" FontSize="12" Foreground="#666"
                            VerticalAlignment="Center" Margin="0,0,10,0"/>
                 <ComboBox ItemsSource="{Binding SpeedOptions}"

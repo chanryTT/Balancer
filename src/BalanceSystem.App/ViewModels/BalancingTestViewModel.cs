@@ -1,3 +1,4 @@
+using System.Collections.ObjectModel;
 using System.Windows;
 using BalanceSystem.Core.Models;
 using BalanceSystem.Core.Services;
@@ -10,6 +11,8 @@ namespace BalanceSystem.App.ViewModels;
 public partial class BalancingTestViewModel : ObservableObject
 {
     private readonly IBalancingTestService _testService;
+    private readonly IRecipeService _recipeService;
+    private readonly ITestRecordService _testRecordService;
 
     [ObservableProperty] private TestStep _currentStep = TestStep.Idle;
     [ObservableProperty] private int _selectedSpeedIndex = 2;
@@ -30,11 +33,24 @@ public partial class BalancingTestViewModel : ObservableObject
     [ObservableProperty] private bool _canAdvance;
     [ObservableProperty] private bool _canReset;
 
+    [ObservableProperty] private ObservableCollection<Recipe> _recipes = [];
+    [ObservableProperty] private Recipe? _selectedRecipe;
+
+    // Store raw measurement data for persisting
+    private double _initialLeftAmp, _initialLeftPhase, _initialRightAmp, _initialRightPhase;
+    private double _leftTrialLeftAmp, _leftTrialLeftPhase, _leftTrialRightAmp, _leftTrialRightPhase;
+    private double _rightTrialLeftAmp, _rightTrialLeftPhase, _rightTrialRightAmp, _rightTrialRightPhase;
+
     public int[] SpeedOptions => Constants.SpeedOptions;
 
-    public BalancingTestViewModel(IBalancingTestService testService)
+    public BalancingTestViewModel(
+        IBalancingTestService testService,
+        IRecipeService recipeService,
+        ITestRecordService testRecordService)
     {
         _testService = testService;
+        _recipeService = recipeService;
+        _testRecordService = testRecordService;
         _testService.StepChanged += OnStepChanged;
         _testService.StabilityChanged += (_, stable) =>
         {
@@ -44,6 +60,9 @@ public partial class BalancingTestViewModel : ObservableObject
                 StabilityText = stable ? "稳定 — 可以记录数据" : "等待稳定...";
             });
         };
+
+        // Fire-and-forget load recipes
+        _ = LoadRecipes();
     }
 
     [RelayCommand]
@@ -56,7 +75,10 @@ public partial class BalancingTestViewModel : ObservableObject
     [RelayCommand]
     private void RecordStep()
     {
-        _testService.RecordCurrentValues();
+        if (SelectedRecipe is not null)
+            _testService.RecordCurrentValues(SelectedRecipe);
+        else
+            _testService.RecordCurrentValues();
     }
 
     [RelayCommand]
@@ -72,9 +94,21 @@ public partial class BalancingTestViewModel : ObservableObject
         HasResult = false;
     }
 
+    [RelayCommand]
+    private async Task LoadRecipes()
+    {
+        try
+        {
+            var list = await _recipeService.GetAllAsync();
+            Application.Current.Dispatcher.Invoke(() =>
+                Recipes = new ObservableCollection<Recipe>(list));
+        }
+        catch { /* non-critical */ }
+    }
+
     private void OnStepChanged(object? sender, TestStep step)
     {
-        Application.Current.Dispatcher.BeginInvoke(() =>
+        Application.Current.Dispatcher.BeginInvoke(async () =>
         {
             CurrentStep = step;
             CanRecord = step is TestStep.InitialRun or TestStep.LeftTrial
@@ -87,8 +121,12 @@ public partial class BalancingTestViewModel : ObservableObject
             {
                 TestStep.Idle => "准备开始测试",
                 TestStep.InitialRun => "步骤 1/4：初始运行 — 请等待转速稳定后记录数据",
-                TestStep.LeftTrial => "步骤 2/4：左面加试重 — 在左平面加试重后运行并记录",
-                TestStep.RightTrial => "步骤 3/4：右面加试重 — 取下左面试重，在右平面加试重后运行并记录",
+                TestStep.LeftTrial => SelectedRecipe is not null
+                    ? $"步骤 2/4：左面加试重 {SelectedRecipe.TrialMass1}g@{SelectedRecipe.TrialAngle1}°"
+                    : "步骤 2/4：左面加试重 — 请先选择配方",
+                TestStep.RightTrial => SelectedRecipe is not null
+                    ? $"步骤 3/4：右面加试重 {SelectedRecipe.TrialMass2}g@{SelectedRecipe.TrialAngle2}°"
+                    : "步骤 3/4：右面加试重 — 请先选择配方",
                 TestStep.Calculation => "步骤 4/4：计算配重结果",
                 TestStep.Completed => "测试完成！可进行复测验证",
                 TestStep.Retest => "复测验证中 — 请等待稳定后记录",
@@ -105,6 +143,42 @@ public partial class BalancingTestViewModel : ObservableObject
                 ResidualRight = result.ResidualRightAmplitude;
                 IsBalanced = result.IsBalanced;
                 HasResult = true;
+            }
+
+            // Save test record to database when test completes
+            if (step == TestStep.Completed && _testService.Result is { } finalResult)
+            {
+                try
+                {
+                    var record = new TestRecord
+                    {
+                        RecipeId = SelectedRecipe?.Id ?? 0,
+                        UserId = 1, // TODO: Phase 3 — use actual logged-in user
+                        Speed = Constants.SpeedOptions[SelectedSpeedIndex],
+                        TestTime = DateTime.Now,
+                        InitialLeftAmplitude = _initialLeftAmp,
+                        InitialLeftPhase = _initialLeftPhase,
+                        InitialRightAmplitude = _initialRightAmp,
+                        InitialRightPhase = _initialRightPhase,
+                        LeftTrialMass = SelectedRecipe?.TrialMass1 ?? 50,
+                        LeftTrialAngle = SelectedRecipe?.TrialAngle1 ?? 0,
+                        RightTrialMass = SelectedRecipe?.TrialMass2 ?? 50,
+                        RightTrialAngle = SelectedRecipe?.TrialAngle2 ?? 0,
+                        LeftCorrectionMass = finalResult.LeftMass,
+                        LeftCorrectionAngle = finalResult.LeftAngle,
+                        RightCorrectionMass = finalResult.RightMass,
+                        RightCorrectionAngle = finalResult.RightAngle,
+                        ResidualLeft = finalResult.ResidualLeftAmplitude,
+                        ResidualRight = finalResult.ResidualRightAmplitude,
+                        IsPassed = finalResult.IsBalanced
+                    };
+                    await _testRecordService.CreateAsync(record);
+                }
+                catch (Exception ex)
+                {
+                    // Don't block the UI — log would help in real app
+                    System.Diagnostics.Debug.WriteLine($"Failed to save test record: {ex.Message}");
+                }
             }
         });
     }
