@@ -1,7 +1,9 @@
 using BalanceSystem.Core.Interfaces;
+using BalanceSystem.Core.Services;
 using BalanceSystem.Infrastructure.DataAcquisition;
 using BalanceSystem.Infrastructure.Database;
 using BalanceSystem.Infrastructure.Logging;
+using BalanceSystem.Infrastructure.Reporting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
@@ -27,14 +29,21 @@ public static class ServiceCollectionExtensions
         // TODO: Phase 2 — register real hardware speed measurement service
         // services.AddSingleton<ISpeedMeasurementService, HardwareSpeedMeasurementService>();
 
-        // ViewModels
-        services.AddSingleton<ViewModels.MonitoringViewModel>();
-        services.AddSingleton<ViewModels.BalancingTestViewModel>();
-        services.AddSingleton<ViewModels.MainViewModel>();
-
         // Business services
         services.AddSingleton<BalanceSystem.Core.Services.IBalancingTestService,
                                BalanceSystem.Core.Services.BalancingTestService>();
+
+        // Phase 2 — Data management services
+        services.AddSingleton<IRecipeService, RecipeService>();
+        services.AddSingleton<ITestRecordService, TestRecordService>();
+        services.AddSingleton<TestReportService>();
+
+        // ViewModels
+        services.AddSingleton<ViewModels.MonitoringViewModel>();
+        services.AddSingleton<ViewModels.BalancingTestViewModel>();
+        services.AddSingleton<ViewModels.RecipeManagementViewModel>();
+        services.AddSingleton<ViewModels.HistoryViewModel>();
+        services.AddSingleton<ViewModels.MainViewModel>();
 
         return services;
     }

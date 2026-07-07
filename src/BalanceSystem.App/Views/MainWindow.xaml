@@ -62,6 +62,8 @@
                 <TabControl SelectedIndex="{Binding SelectedTabIndex}" Background="Transparent" BorderThickness="0">
                     <TabItem Header="Monitor"/>
                     <TabItem Header="Balance Test"/>
+                    <TabItem Header="Recipes"/>
+                    <TabItem Header="History"/>
                 </TabControl>
             </Border>
             <Grid Grid.Row="1">
@@ -69,6 +71,10 @@
                     Visibility="{Binding SelectedTabIndex, Converter={StaticResource TabToVisibility}, ConverterParameter=0}"/>
                 <views:BalancingTestView DataContext="{Binding BalancingTest}"
                     Visibility="{Binding SelectedTabIndex, Converter={StaticResource TabToVisibility}, ConverterParameter=1}"/>
+                <views:RecipeManagementView DataContext="{Binding RecipeManagement}"
+                    Visibility="{Binding SelectedTabIndex, Converter={StaticResource TabToVisibility}, ConverterParameter=2}"/>
+                <views:HistoryView DataContext="{Binding History}"
+                    Visibility="{Binding SelectedTabIndex, Converter={StaticResource TabToVisibility}, ConverterParameter=3}"/>
             </Grid>
         </Grid>
 

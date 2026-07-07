@@ -11,10 +11,18 @@ public partial class MainViewModel : ObservableObject
 
     public MonitoringViewModel Monitoring { get; }
     public BalancingTestViewModel BalancingTest { get; }
+    public RecipeManagementViewModel RecipeManagement { get; }
+    public HistoryViewModel History { get; }
 
-    public MainViewModel(MonitoringViewModel monitoring, BalancingTestViewModel balancingTest)
+    public MainViewModel(
+        MonitoringViewModel monitoring,
+        BalancingTestViewModel balancingTest,
+        RecipeManagementViewModel recipeManagement,
+        HistoryViewModel history)
     {
         Monitoring = monitoring;
         BalancingTest = balancingTest;
+        RecipeManagement = recipeManagement;
+        History = history;
     }
 }
