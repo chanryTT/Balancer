@@ -1,0 +1,158 @@
+<UserControl x:Class="BalanceSystem.App.Views.RecipeManagementView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:BalanceSystem.App.ViewModels"
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance Type=vm:RecipeManagementViewModel}">
+    <Grid Background="White" Margin="10">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="2*" MinWidth="300"/>
+            <ColumnDefinition Width="5"/>
+            <ColumnDefinition Width="*" MinWidth="280"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- Left: Recipe list -->
+        <Grid Grid.Column="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <!-- Search bar -->
+            <DockPanel Grid.Row="0" Margin="0,0,0,8">
+                <Button Content="搜索" Width="50" Height="24" DockPanel.Dock="Right"
+                        Background="#2C5AA0" Foreground="White" BorderThickness="0"
+                        FontSize="12" Command="{Binding SearchCommand}"/>
+                <TextBox Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" Height="24"
+                         VerticalContentAlignment="Center" FontSize="12"/>
+            </DockPanel>
+
+            <!-- Toolbar -->
+            <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,6">
+                <Button Content="+ 新建" Width="60" Height="26"
+                        Background="#28A745" Foreground="White" BorderThickness="0"
+                        FontSize="12" Command="{Binding NewRecipeCommand}"/>
+                <Button Content="✎ 编辑" Width="60" Height="26" Margin="6,0,0,0"
+                        Background="#2C5AA0" Foreground="White" BorderThickness="0"
+                        FontSize="12" Command="{Binding EditRecipeCommand}"/>
+                <Button Content="✕ 删除" Width="60" Height="26" Margin="6,0,0,0"
+                        Background="#DC3545" Foreground="White" BorderThickness="0"
+                        FontSize="12" Command="{Binding DeleteRecipeCommand}"/>
+                <Button Content="导出" Width="50" Height="26" Margin="6,0,0,0"
+                        Background="#6C757D" Foreground="White" BorderThickness="0"
+                        FontSize="12" Command="{Binding ExportRecipeCommand}"/>
+                <Button Content="导入" Width="50" Height="26" Margin="6,0,0,0"
+                        Background="#6C757D" Foreground="White" BorderThickness="0"
+                        FontSize="12" Command="{Binding ImportRecipeCommand}"/>
+                <Button Content="全部导出" Width="70" Height="26" Margin="6,0,0,0"
+                        Background="#6C757D" Foreground="White" BorderThickness="0"
+                        FontSize="12" Command="{Binding ExportAllCommand}"/>
+            </StackPanel>
+
+            <!-- DataGrid -->
+            <DataGrid Grid.Row="2" ItemsSource="{Binding Recipes}"
+                      SelectedItem="{Binding SelectedRecipe}"
+                      AutoGenerateColumns="False" IsReadOnly="True"
+                      SelectionMode="Single" GridLinesVisibility="Horizontal"
+                      HeadersVisibility="Column" FontSize="12"
+                      Loaded="DataGrid_Loaded">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="40"/>
+                    <DataGridTextColumn Header="配方名称" Binding="{Binding Name}" Width="*" MinWidth="100"/>
+                    <DataGridTextColumn Header="额定转速" Binding="{Binding RatedSpeed}" Width="70"/>
+                    <DataGridTextColumn Header="试重1(g)" Binding="{Binding TrialMass1}" Width="65"/>
+                    <DataGridTextColumn Header="试重1(°)" Binding="{Binding TrialAngle1}" Width="65"/>
+                    <DataGridTextColumn Header="创建时间" Binding="{Binding CreateTime, StringFormat={}{0:yyyy-MM-dd}}" Width="90"/>
+                </DataGrid.Columns>
+            </DataGrid>
+
+            <!-- Status -->
+            <TextBlock Grid.Row="3" Text="{Binding StatusText}" FontSize="11"
+                       Foreground="#666" Margin="0,6,0,0"/>
+        </Grid>
+
+        <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Stretch"
+                      Background="#E0E0E0"/>
+
+        <!-- Right: Edit form -->
+        <Border Grid.Column="2" BorderBrush="#E0E0E0" BorderThickness="1"
+                Visibility="{Binding IsEditing, Converter={StaticResource BoolToVisibility}}">
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <StackPanel Margin="12">
+                    <TextBlock Text="配方编辑" FontSize="14" FontWeight="Bold"
+                               Foreground="#2C5AA0" Margin="0,0,0,12"/>
+
+                    <TextBlock Text="配方名称" FontSize="11" Foreground="#666"/>
+                    <TextBox Text="{Binding EditName, UpdateSourceTrigger=PropertyChanged}"
+                             Height="26" FontSize="12" Margin="0,2,0,8"/>
+
+                    <TextBlock Text="额定转速" FontSize="11" Foreground="#666"/>
+                    <ComboBox ItemsSource="{Binding SpeedOptions}" Height="26"
+                              SelectedItem="{Binding EditRatedSpeed}" FontSize="12" Margin="0,2,0,8"/>
+
+                    <TextBlock Text="左面允许不平衡量 (μm)" FontSize="11" Foreground="#666"/>
+                    <TextBox Text="{Binding EditAllowUnbalanceLeft, UpdateSourceTrigger=PropertyChanged}"
+                             Height="26" FontSize="12" Margin="0,2,0,8"/>
+
+                    <TextBlock Text="右面允许不平衡量 (μm)" FontSize="11" Foreground="#666"/>
+                    <TextBox Text="{Binding EditAllowUnbalanceRight, UpdateSourceTrigger=PropertyChanged}"
+                             Height="26" FontSize="12" Margin="0,2,0,8"/>
+
+                    <Separator Margin="0,4"/>
+                    <TextBlock Text="试重参数" FontSize="12" FontWeight="Bold"
+                               Foreground="#333" Margin="0,0,0,6"/>
+
+                    <TextBlock Text="左面试重质量 (g)" FontSize="11" Foreground="#666"/>
+                    <TextBox Text="{Binding EditTrialMass1, UpdateSourceTrigger=PropertyChanged}"
+                             Height="26" FontSize="12" Margin="0,2,0,8"/>
+
+                    <TextBlock Text="左面试重角度 (°)" FontSize="11" Foreground="#666"/>
+                    <TextBox Text="{Binding EditTrialAngle1, UpdateSourceTrigger=PropertyChanged}"
+                             Height="26" FontSize="12" Margin="0,2,0,8"/>
+
+                    <TextBlock Text="右面试重质量 (g)" FontSize="11" Foreground="#666"/>
+                    <TextBox Text="{Binding EditTrialMass2, UpdateSourceTrigger=PropertyChanged}"
+                             Height="26" FontSize="12" Margin="0,2,0,8"/>
+
+                    <TextBlock Text="右面试重角度 (°)" FontSize="11" Foreground="#666"/>
+                    <TextBox Text="{Binding EditTrialAngle2, UpdateSourceTrigger=PropertyChanged}"
+                             Height="26" FontSize="12" Margin="0,2,0,8"/>
+
+                    <Separator Margin="0,4"/>
+                    <TextBlock Text="校准系数" FontSize="12" FontWeight="Bold"
+                               Foreground="#333" Margin="0,0,0,6"/>
+
+                    <TextBlock Text="左面校准系数" FontSize="11" Foreground="#666"/>
+                    <TextBox Text="{Binding EditCalibrationFactorLeft, UpdateSourceTrigger=PropertyChanged}"
+                             Height="26" FontSize="12" Margin="0,2,0,8"/>
+
+                    <TextBlock Text="右面校准系数" FontSize="11" Foreground="#666"/>
+                    <TextBox Text="{Binding EditCalibrationFactorRight, UpdateSourceTrigger=PropertyChanged}"
+                             Height="26" FontSize="12" Margin="0,2,0,8"/>
+
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,12,0,0">
+                        <Button Content="取消" Width="60" Height="28" Margin="0,0,8,0"
+                                Background="#6C757D" Foreground="White" BorderThickness="0"
+                                FontSize="12" Command="{Binding CancelEditCommand}"/>
+                        <Button Content="保存" Width="60" Height="28"
+                                Background="#2C5AA0" Foreground="White" BorderThickness="0"
+                                FontSize="12" Command="{Binding SaveRecipeCommand}"/>
+                    </StackPanel>
+                </StackPanel>
+            </ScrollViewer>
+        </Border>
+
+        <!-- Empty state when not editing -->
+        <Border Grid.Column="2" BorderBrush="#E0E0E0" BorderThickness="1"
+                Visibility="{Binding IsEditing, Converter={StaticResource InverseBoolToVisibility}}">
+            <TextBlock Text="选择配方后点击编辑，或点击新建创建配方"
+                       FontSize="13" Foreground="#999"
+                       HorizontalAlignment="Center" VerticalAlignment="Center"
+                       TextWrapping="Wrap" Margin="20"/>
+        </Border>
+    </Grid>
+</UserControl>
