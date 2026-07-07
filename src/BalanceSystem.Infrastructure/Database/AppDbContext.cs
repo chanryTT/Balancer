@@ -5,7 +5,7 @@ namespace BalanceSystem.Infrastructure.Database;
 
 public class AppDbContext
 {
-    public IFreeSql Orm { get; }
+    public IFreeSql Orm { get; set; }
 
     public AppDbContext(string connectionString)
     {
