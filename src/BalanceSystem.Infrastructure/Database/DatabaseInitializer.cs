@@ -19,7 +19,10 @@ public class DatabaseInitializer
     public void Initialize()
     {
         _logger.LogInformation("Initializing database...");
+
         _db.Orm.CodeFirst.SyncStructure<User>();
+        _db.Orm.CodeFirst.SyncStructure<Recipe>();
+        _db.Orm.CodeFirst.SyncStructure<TestRecord>();
 
         if (!_db.Orm.Select<User>().Any())
         {
@@ -31,6 +34,23 @@ public class DatabaseInitializer
                 IsActive = true
             }).ExecuteAffrows();
             _logger.LogInformation("Seeded default admin user");
+        }
+
+        // Seed a sample recipe for testing
+        if (!_db.Orm.Select<Recipe>().Any())
+        {
+            _db.Orm.Insert(new Recipe
+            {
+                Name = "演示转子",
+                RatedSpeed = 1500,
+                AllowUnbalanceLeft = 1.0,
+                AllowUnbalanceRight = 1.0,
+                TrialMass1 = 50,
+                TrialAngle1 = 0,
+                TrialMass2 = 50,
+                TrialAngle2 = 0
+            }).ExecuteAffrows();
+            _logger.LogInformation("Seeded default demo recipe");
         }
 
         _logger.LogInformation("Database initialization complete");
