@@ -1,0 +1,103 @@
+<UserControl x:Class="BalanceSystem.App.Views.MonitoringView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:controls="clr-namespace:BalanceSystem.App.Controls"
+             xmlns:vm="clr-namespace:BalanceSystem.App.ViewModels"
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance Type=vm:MonitoringViewModel}">
+    <Grid Background="White">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <Grid Grid.Row="0" Margin="10">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="2*"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Waveform -->
+            <Border Grid.Column="0" BorderBrush="#E0E0E0" BorderThickness="1" Margin="0,0,10,0">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <TextBlock Grid.Row="0" Text="Left/Right Waveform" FontSize="13"
+                               FontWeight="SemiBold" Foreground="#333333" Margin="8,6"/>
+                    <controls:WaveformControl x:Name="Waveform" Grid.Row="1"/>
+                </Grid>
+            </Border>
+
+            <GridSplitter Grid.Column="1" Width="4" HorizontalAlignment="Center"
+                          VerticalAlignment="Stretch" Background="#E0E0E0"/>
+
+            <!-- Numeric + Polar -->
+            <Grid Grid.Column="2">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <WrapPanel Grid.Row="0" Margin="0,0,0,10">
+                    <controls:NumericDisplay Label="Speed" Value="{Binding Speed}"
+                        Unit="RPM" Width="110" Height="70" Margin="4" StatusColor="#2C5AA0"/>
+                    <controls:NumericDisplay Label="Left Amp" Value="{Binding LeftAmplitude}"
+                        Unit="mm/s" Width="110" Height="70" Margin="4" StatusColor="#333333"/>
+                    <controls:NumericDisplay Label="Right Amp" Value="{Binding RightAmplitude}"
+                        Unit="mm/s" Width="110" Height="70" Margin="4" StatusColor="#333333"/>
+                    <controls:NumericDisplay Label="Left Phase" Value="{Binding LeftPhase}"
+                        Unit="deg" Width="110" Height="70" Margin="4" StatusColor="#333333"/>
+                    <controls:NumericDisplay Label="Right Phase" Value="{Binding RightPhase}"
+                        Unit="deg" Width="110" Height="70" Margin="4" StatusColor="#333333"/>
+                </WrapPanel>
+
+                <Border Grid.Row="1" BorderBrush="#E0E0E0" BorderThickness="1">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <TextBlock Grid.Row="0" Text="Polar Plot" FontSize="13"
+                                   FontWeight="SemiBold" Foreground="#333333" Margin="8,6"/>
+                        <controls:PolarPlotControl x:Name="PolarPlot" Grid.Row="1"/>
+                    </Grid>
+                </Border>
+            </Grid>
+        </Grid>
+
+        <!-- Status bar + Controls -->
+        <Border Grid.Row="1" Background="#F5F5F5" Padding="10,6" Margin="10,0,10,10">
+            <StackPanel Orientation="Horizontal">
+                <Ellipse Width="10" Height="10" Margin="0,0,4,0">
+                    <Ellipse.Style>
+                        <Style TargetType="Ellipse">
+                            <Setter Property="Fill" Value="Red"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsConnected}" Value="True">
+                                    <Setter Property="Fill" Value="Green"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Ellipse.Style>
+                </Ellipse>
+                <TextBlock Text="{Binding ConnectionStatusText}" FontSize="12"
+                           Foreground="#666666" Margin="0,0,20,0"/>
+                <TextBlock Text="Speed:" FontSize="12" Foreground="#666666" Margin="10,0,5,0"/>
+                <ComboBox ItemsSource="{Binding SpeedOptions}"
+                          SelectedIndex="{Binding SelectedSpeedIndex}"
+                          Width="90" Height="24" FontSize="12"/>
+                <Button Content="Start Sim" Width="70" Height="24" Margin="10,0,4,0"
+                        Background="#2C5AA0" Foreground="White" BorderThickness="0"
+                        FontSize="12" Command="{Binding StartAcquisitionCommand}"/>
+                <Button Content="Stop" Width="50" Height="24" Margin="4,0,0,0"
+                        Background="#DC3545" Foreground="White" BorderThickness="0"
+                        FontSize="12" Command="{Binding StopAcquisitionCommand}"/>
+            </StackPanel>
+        </Border>
+    </Grid>
+</UserControl>
