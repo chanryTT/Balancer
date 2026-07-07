@@ -3,9 +3,10 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:BalanceSystem.App"
              xmlns:converters="clr-namespace:BalanceSystem.App.Converters"
-             StartupUri="MainWindow.xaml">
+             >
     <Application.Resources>
         <converters:BoolToVisibilityConverter x:Key="BoolToVisibility"/>
         <converters:BoolToPassFailConverter x:Key="BoolToPassFail"/>
+        <converters:TabToVisibilityConverter x:Key="TabToVisibility"/>
     </Application.Resources>
 </Application>

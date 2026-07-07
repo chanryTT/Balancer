@@ -35,5 +35,9 @@ public partial class App : Application
 
         var initializer = Services.GetRequiredService<DatabaseInitializer>();
         initializer.Initialize();
+
+        var mainViewModel = Services.GetRequiredService<ViewModels.MainViewModel>();
+        var mainWindow = new Views.MainWindow { DataContext = mainViewModel };
+        mainWindow.Show();
     }
 }

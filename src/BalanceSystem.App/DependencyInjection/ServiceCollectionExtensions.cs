@@ -24,6 +24,15 @@ public static class ServiceCollectionExtensions
 
         services.AddSingleton<IDataAcquisitionService, CsvSimulationService>();
 
+        // ViewModels
+        services.AddSingleton<ViewModels.MonitoringViewModel>();
+        services.AddSingleton<ViewModels.BalancingTestViewModel>();
+        services.AddSingleton<ViewModels.MainViewModel>();
+
+        // Business services
+        services.AddSingleton<BalanceSystem.Core.Services.IBalancingTestService,
+                               BalanceSystem.Core.Services.BalancingTestService>();
+
         return services;
     }
 }
