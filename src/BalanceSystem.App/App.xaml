@@ -8,6 +8,7 @@
         <converters:BoolToVisibilityConverter x:Key="BoolToVisibility"/>
         <converters:InverseBoolToVisibilityConverter x:Key="InverseBoolToVisibility"/>
         <converters:BoolToPassFailConverter x:Key="BoolToPassFail"/>
+        <converters:BoolToPassFailColorConverter x:Key="BoolToPassFailColor"/>
         <converters:TabToVisibilityConverter x:Key="TabToVisibility"/>
     </Application.Resources>
 </Application>

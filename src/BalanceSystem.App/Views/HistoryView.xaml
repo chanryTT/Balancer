@@ -1,0 +1,119 @@
+<UserControl x:Class="BalanceSystem.App.Views.HistoryView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:BalanceSystem.App.ViewModels"
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance Type=vm:HistoryViewModel}"
+             Loaded="UserControl_Loaded">
+    <Grid Background="White" Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Filter panel -->
+        <Border Grid.Row="0" Background="#F8F9FA" Padding="10" Margin="0,0,0,8">
+            <WrapPanel>
+                <StackPanel Orientation="Horizontal" Margin="0,0,15,0">
+                    <TextBlock Text="起始:" FontSize="11" Foreground="#666" VerticalAlignment="Center"/>
+                    <DatePicker SelectedDate="{Binding DateFrom}" Width="120" Height="24"
+                                FontSize="11" Margin="4,0"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="0,0,15,0">
+                    <TextBlock Text="截止:" FontSize="11" Foreground="#666" VerticalAlignment="Center"/>
+                    <DatePicker SelectedDate="{Binding DateTo}" Width="120" Height="24"
+                                FontSize="11" Margin="4,0"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="0,0,15,0">
+                    <TextBlock Text="配方:" FontSize="11" Foreground="#666" VerticalAlignment="Center"/>
+                    <ComboBox ItemsSource="{Binding Recipes}" Width="130" Height="24"
+                              SelectedValue="{Binding FilterRecipeId}"
+                              SelectedValuePath="Id" DisplayMemberPath="Name"
+                              FontSize="11" Margin="4,0"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="0,0,15,0">
+                    <TextBlock Text="结果:" FontSize="11" Foreground="#666" VerticalAlignment="Center"/>
+                    <ComboBox ItemsSource="{Binding PassFilterOptions}"
+                              SelectedValue="{Binding FilterIsPassed}"
+                              SelectedValuePath="Key" DisplayMemberPath="Value"
+                              Width="80" Height="24" FontSize="11" Margin="4,0"/>
+                </StackPanel>
+                <Button Content="查询" Width="50" Height="24"
+                        Background="#2C5AA0" Foreground="White" BorderThickness="0"
+                        FontSize="11" Command="{Binding QueryCommand}"/>
+                <Button Content="重置" Width="50" Height="24" Margin="6,0,0,0"
+                        Background="#6C757D" Foreground="White" BorderThickness="0"
+                        FontSize="11" Command="{Binding ResetFiltersCommand}"/>
+            </WrapPanel>
+        </Border>
+
+        <!-- Toolbar -->
+        <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,6">
+            <Button Content="查看详情" Width="70" Height="24"
+                    Background="#2C5AA0" Foreground="White" BorderThickness="0"
+                    FontSize="11" Command="{Binding ViewDetailCommand}"/>
+            <Button Content="同配方对比" Width="80" Height="24" Margin="6,0,0,0"
+                    Background="#17A2B8" Foreground="White" BorderThickness="0"
+                    FontSize="11" Command="{Binding CompareByRecipeCommand}"/>
+            <Button Content="导出PDF" Width="70" Height="24" Margin="6,0,0,0"
+                    Background="#DC3545" Foreground="White" BorderThickness="0"
+                    FontSize="11" Command="{Binding ExportPdfCommand}"/>
+        </StackPanel>
+
+        <!-- DataGrid -->
+        <DataGrid Grid.Row="2" ItemsSource="{Binding Records}"
+                  SelectedItem="{Binding SelectedRecord}"
+                  AutoGenerateColumns="False" IsReadOnly="True"
+                  SelectionMode="Single" GridLinesVisibility="Horizontal"
+                  HeadersVisibility="Column" FontSize="11">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="40"/>
+                <DataGridTextColumn Header="配方ID" Binding="{Binding RecipeId}" Width="55"/>
+                <DataGridTextColumn Header="测试时间" Binding="{Binding TestTime, StringFormat={}{0:yyyy-MM-dd HH:mm}}" Width="130"/>
+                <DataGridTextColumn Header="转速" Binding="{Binding Speed, StringFormat={}{0:F0}}" Width="60"/>
+                <DataGridTextColumn Header="左配重(g)" Binding="{Binding LeftCorrectionMass, StringFormat={}{0:F2}}" Width="75"/>
+                <DataGridTextColumn Header="左角度(°)" Binding="{Binding LeftCorrectionAngle, StringFormat={}{0:F1}}" Width="70"/>
+                <DataGridTextColumn Header="右配重(g)" Binding="{Binding RightCorrectionMass, StringFormat={}{0:F2}}" Width="75"/>
+                <DataGridTextColumn Header="右角度(°)" Binding="{Binding RightCorrectionAngle, StringFormat={}{0:F1}}" Width="70"/>
+                <DataGridTextColumn Header="剩余左" Binding="{Binding ResidualLeft, StringFormat={}{0:F2}}" Width="60"/>
+                <DataGridTextColumn Header="剩余右" Binding="{Binding ResidualRight, StringFormat={}{0:F2}}" Width="60"/>
+                <DataGridTemplateColumn Header="判定" Width="50">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding IsPassed, Converter={StaticResource BoolToPassFail}}"
+                                       Foreground="{Binding IsPassed, Converter={StaticResource BoolToPassFailColor}}"
+                                       FontWeight="Bold" FontSize="11"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <!-- Pagination and status -->
+        <Grid Grid.Row="3" Margin="0,8,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <StackPanel Grid.Column="0" Orientation="Horizontal">
+                <Button Content="上一页" Width="60" Height="24"
+                        Background="#E8F0FE" Foreground="#2C5AA0"
+                        BorderBrush="#2C5AA0" BorderThickness="1"
+                        FontSize="11" IsEnabled="{Binding HasPrevPage}"
+                        Command="{Binding PrevPageCommand}"/>
+                <Button Content="下一页" Width="60" Height="24" Margin="6,0,0,0"
+                        Background="#E8F0FE" Foreground="#2C5AA0"
+                        BorderBrush="#2C5AA0" BorderThickness="1"
+                        FontSize="11" IsEnabled="{Binding HasNextPage}"
+                        Command="{Binding NextPageCommand}"/>
+            </StackPanel>
+            <TextBlock Grid.Column="1" Text="{Binding StatusText}" FontSize="11"
+                       Foreground="#666" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+        </Grid>
+    </Grid>
+</UserControl>
