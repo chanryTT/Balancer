@@ -1,0 +1,11 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/BalanceSystem.App/BalanceSystem.App.csproj" />
+    <Project Path="src/BalanceSystem.Core/BalanceSystem.Core.csproj" />
+    <Project Path="src/BalanceSystem.Infrastructure/BalanceSystem.Infrastructure.csproj" />
+    <Project Path="src/BalanceSystem.Shared/BalanceSystem.Shared.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/BalanceSystem.Core.Tests/BalanceSystem.Core.Tests.csproj" />
+  </Folder>
+</Solution>

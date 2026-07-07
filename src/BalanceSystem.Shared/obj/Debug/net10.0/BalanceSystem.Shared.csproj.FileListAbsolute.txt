@@ -1,0 +1,11 @@
+E:\Balancer\src\BalanceSystem.Shared\bin\Debug\net10.0\BalanceSystem.Shared.deps.json
+E:\Balancer\src\BalanceSystem.Shared\bin\Debug\net10.0\BalanceSystem.Shared.dll
+E:\Balancer\src\BalanceSystem.Shared\bin\Debug\net10.0\BalanceSystem.Shared.pdb
+E:\Balancer\src\BalanceSystem.Shared\obj\Debug\net10.0\BalanceSystem.Shared.GeneratedMSBuildEditorConfig.editorconfig
+E:\Balancer\src\BalanceSystem.Shared\obj\Debug\net10.0\BalanceSystem.Shared.AssemblyInfoInputs.cache
+E:\Balancer\src\BalanceSystem.Shared\obj\Debug\net10.0\BalanceSystem.Shared.AssemblyInfo.cs
+E:\Balancer\src\BalanceSystem.Shared\obj\Debug\net10.0\BalanceSystem.Shared.csproj.CoreCompileInputs.cache
+E:\Balancer\src\BalanceSystem.Shared\obj\Debug\net10.0\BalanceSystem.Shared.dll
+E:\Balancer\src\BalanceSystem.Shared\obj\Debug\net10.0\refint\BalanceSystem.Shared.dll
+E:\Balancer\src\BalanceSystem.Shared\obj\Debug\net10.0\BalanceSystem.Shared.pdb
+E:\Balancer\src\BalanceSystem.Shared\obj\Debug\net10.0\ref\BalanceSystem.Shared.dll
