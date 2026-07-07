@@ -169,12 +169,13 @@ public partial class HistoryViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private void ResetFilters()
+    private async Task ResetFilters()
     {
         DateFrom = null;
         DateTo = null;
         FilterRecipeId = null;
         FilterIsPassed = null;
         CurrentPage = 1;
+        await Query();
     }
 }

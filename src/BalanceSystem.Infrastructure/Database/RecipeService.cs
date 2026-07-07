@@ -75,10 +75,13 @@ public class RecipeService : IRecipeService
 
     public Task<List<Recipe>> SearchAsync(string keyword)
     {
-        return _db.Orm.Select<Recipe>()
-            .Where(r => r.Name.Contains(keyword) || r.RatedSpeed.ToString().Contains(keyword))
-            .OrderByDescending(r => r.CreateTime)
-            .ToListAsync();
+        bool isNumeric = int.TryParse(keyword, out int speedKw);
+        var query = _db.Orm.Select<Recipe>();
+        if (isNumeric)
+            query = query.Where(r => r.Name.Contains(keyword) || r.RatedSpeed == speedKw);
+        else
+            query = query.Where(r => r.Name.Contains(keyword));
+        return query.OrderByDescending(r => r.CreateTime).ToListAsync();
     }
 
     public async Task<string> ExportToJsonAsync(int id)

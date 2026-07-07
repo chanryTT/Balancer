@@ -95,11 +95,11 @@
                               SelectedItem="{Binding EditRatedSpeed}" FontSize="12" Margin="0,2,0,8"/>
 
                     <TextBlock Text="左面允许不平衡量 (μm)" FontSize="11" Foreground="#666"/>
-                    <TextBox Text="{Binding EditAllowUnbalanceLeft, UpdateSourceTrigger=PropertyChanged}"
+                    <TextBox Text="{Binding EditAllowUnbalanceLeft, UpdateSourceTrigger=PropertyChanged, ValidatesOnExceptions=True}"
                              Height="26" FontSize="12" Margin="0,2,0,8"/>
 
                     <TextBlock Text="右面允许不平衡量 (μm)" FontSize="11" Foreground="#666"/>
-                    <TextBox Text="{Binding EditAllowUnbalanceRight, UpdateSourceTrigger=PropertyChanged}"
+                    <TextBox Text="{Binding EditAllowUnbalanceRight, UpdateSourceTrigger=PropertyChanged, ValidatesOnExceptions=True}"
                              Height="26" FontSize="12" Margin="0,2,0,8"/>
 
                     <Separator Margin="0,4"/>
@@ -107,19 +107,19 @@
                                Foreground="#333" Margin="0,0,0,6"/>
 
                     <TextBlock Text="左面试重质量 (g)" FontSize="11" Foreground="#666"/>
-                    <TextBox Text="{Binding EditTrialMass1, UpdateSourceTrigger=PropertyChanged}"
+                    <TextBox Text="{Binding EditTrialMass1, UpdateSourceTrigger=PropertyChanged, ValidatesOnExceptions=True}"
                              Height="26" FontSize="12" Margin="0,2,0,8"/>
 
                     <TextBlock Text="左面试重角度 (°)" FontSize="11" Foreground="#666"/>
-                    <TextBox Text="{Binding EditTrialAngle1, UpdateSourceTrigger=PropertyChanged}"
+                    <TextBox Text="{Binding EditTrialAngle1, UpdateSourceTrigger=PropertyChanged, ValidatesOnExceptions=True}"
                              Height="26" FontSize="12" Margin="0,2,0,8"/>
 
                     <TextBlock Text="右面试重质量 (g)" FontSize="11" Foreground="#666"/>
-                    <TextBox Text="{Binding EditTrialMass2, UpdateSourceTrigger=PropertyChanged}"
+                    <TextBox Text="{Binding EditTrialMass2, UpdateSourceTrigger=PropertyChanged, ValidatesOnExceptions=True}"
                              Height="26" FontSize="12" Margin="0,2,0,8"/>
 
                     <TextBlock Text="右面试重角度 (°)" FontSize="11" Foreground="#666"/>
-                    <TextBox Text="{Binding EditTrialAngle2, UpdateSourceTrigger=PropertyChanged}"
+                    <TextBox Text="{Binding EditTrialAngle2, UpdateSourceTrigger=PropertyChanged, ValidatesOnExceptions=True}"
                              Height="26" FontSize="12" Margin="0,2,0,8"/>
 
                     <Separator Margin="0,4"/>
@@ -127,11 +127,11 @@
                                Foreground="#333" Margin="0,0,0,6"/>
 
                     <TextBlock Text="左面校准系数" FontSize="11" Foreground="#666"/>
-                    <TextBox Text="{Binding EditCalibrationFactorLeft, UpdateSourceTrigger=PropertyChanged}"
+                    <TextBox Text="{Binding EditCalibrationFactorLeft, UpdateSourceTrigger=PropertyChanged, ValidatesOnExceptions=True}"
                              Height="26" FontSize="12" Margin="0,2,0,8"/>
 
                     <TextBlock Text="右面校准系数" FontSize="11" Foreground="#666"/>
-                    <TextBox Text="{Binding EditCalibrationFactorRight, UpdateSourceTrigger=PropertyChanged}"
+                    <TextBox Text="{Binding EditCalibrationFactorRight, UpdateSourceTrigger=PropertyChanged, ValidatesOnExceptions=True}"
                              Height="26" FontSize="12" Margin="0,2,0,8"/>
 
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,12,0,0">

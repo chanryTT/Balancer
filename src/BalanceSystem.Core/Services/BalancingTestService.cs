@@ -18,6 +18,10 @@ public class BalancingTestService : IBalancingTestService
     public TestStep CurrentStep { get; private set; } = TestStep.Idle;
     public bool IsStable { get; private set; }
     public BalancingResult? Result { get; private set; }
+    public double LastLeftAmplitude { get; private set; }
+    public double LastLeftPhase { get; private set; }
+    public double LastRightAmplitude { get; private set; }
+    public double LastRightPhase { get; private set; }
     public event EventHandler<TestStep>? StepChanged;
     public event EventHandler<bool>? StabilityChanged;
 
@@ -58,6 +62,11 @@ public class BalancingTestService : IBalancingTestService
         var (leftAmp, leftPhase) = FftCalculator.ExtractFundamental(leftSignal, Constants.DefaultSampleRate, speed);
         var (rightAmp, rightPhase) = FftCalculator.ExtractFundamental(rightSignal, Constants.DefaultSampleRate, speed);
 
+        LastLeftAmplitude = leftAmp;
+        LastLeftPhase = leftPhase;
+        LastRightAmplitude = rightAmp;
+        LastRightPhase = rightPhase;
+
         switch (CurrentStep)
         {
             case TestStep.InitialRun:
@@ -82,6 +91,12 @@ public class BalancingTestService : IBalancingTestService
 
     public void RecordCurrentValues(Recipe recipe)
     {
+        if (recipe is null)
+        {
+            RecordCurrentValues(50, 0);
+            return;
+        }
+
         double trialMass = CurrentStep switch
         {
             TestStep.LeftTrial => recipe.TrialMass1,

@@ -12,7 +12,14 @@ public partial class HistoryView : UserControl
 
     private async void UserControl_Loaded(object sender, RoutedEventArgs e)
     {
-        if (DataContext is ViewModels.HistoryViewModel vm)
-            await vm.LoadCommand.ExecuteAsync(null);
+        try
+        {
+            if (DataContext is ViewModels.HistoryViewModel vm)
+                await vm.LoadCommand.ExecuteAsync(null);
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Failed to load view: {ex.Message}");
+        }
     }
 }

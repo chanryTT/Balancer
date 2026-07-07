@@ -7,6 +7,10 @@ public interface IBalancingTestService
     TestStep CurrentStep { get; }
     bool IsStable { get; }
     BalancingResult? Result { get; }
+    double LastLeftAmplitude { get; }
+    double LastLeftPhase { get; }
+    double LastRightAmplitude { get; }
+    double LastRightPhase { get; }
     event EventHandler<TestStep>? StepChanged;
     event EventHandler<bool>? StabilityChanged;
 

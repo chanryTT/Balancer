@@ -13,6 +13,7 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
         <!-- Filter panel -->
@@ -115,5 +116,46 @@
             <TextBlock Grid.Column="1" Text="{Binding StatusText}" FontSize="11"
                        Foreground="#666" HorizontalAlignment="Center" VerticalAlignment="Center"/>
         </Grid>
+
+        <!-- Comparison panel -->
+        <Border Grid.Row="4" Background="#F0F8FF" BorderBrush="#2C5AA0" BorderThickness="1"
+                Padding="12" Margin="0,8,0,0"
+                Visibility="{Binding IsComparing, Converter={StaticResource BoolToVisibility}}">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <StackPanel Grid.Row="0" Orientation="Horizontal">
+                    <TextBlock Text="{Binding CompareHeader}" FontSize="13" FontWeight="Bold"
+                               Foreground="#2C5AA0" Margin="0,0,10,0"/>
+                    <Button Content="Close" Width="50" Height="22"
+                            Background="#6C757D" Foreground="White" BorderThickness="0"
+                            FontSize="11" Command="{Binding CloseCompareCommand}"/>
+                </StackPanel>
+                <DataGrid Grid.Row="1" ItemsSource="{Binding CompareRecords}" Margin="0,8,0,0"
+                          AutoGenerateColumns="False" IsReadOnly="True" FontSize="11"
+                          HeadersVisibility="Column" GridLinesVisibility="Horizontal">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="时间" Binding="{Binding TestTime, StringFormat={}{0:yyyy-MM-dd HH:mm}}" Width="130"/>
+                        <DataGridTextColumn Header="Left Mass" Binding="{Binding LeftCorrectionMass, StringFormat={}{0:F1}}" Width="70"/>
+                        <DataGridTextColumn Header="Left Angle" Binding="{Binding LeftCorrectionAngle, StringFormat={}{0:F0}}" Width="70"/>
+                        <DataGridTextColumn Header="Right Mass" Binding="{Binding RightCorrectionMass, StringFormat={}{0:F1}}" Width="70"/>
+                        <DataGridTextColumn Header="Right Angle" Binding="{Binding RightCorrectionAngle, StringFormat={}{0:F0}}" Width="70"/>
+                        <DataGridTextColumn Header="Residual L" Binding="{Binding ResidualLeft, StringFormat={}{0:F2}}" Width="70"/>
+                        <DataGridTextColumn Header="Residual R" Binding="{Binding ResidualRight, StringFormat={}{0:F2}}" Width="70"/>
+                        <DataGridTemplateColumn Header="Result" Width="50">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding IsPassed, Converter={StaticResource BoolToPassFail}}"
+                                               Foreground="{Binding IsPassed, Converter={StaticResource BoolToPassFailColor}}"
+                                               FontWeight="Bold" FontSize="11"/>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </Grid>
+        </Border>
     </Grid>
 </UserControl>

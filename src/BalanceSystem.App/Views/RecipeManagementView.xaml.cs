@@ -13,7 +13,14 @@ public partial class RecipeManagementView : UserControl
 
     private async void DataGrid_Loaded(object sender, RoutedEventArgs e)
     {
-        if (DataContext is RecipeManagementViewModel vm)
-            await vm.LoadRecipesCommand.ExecuteAsync(null);
+        try
+        {
+            if (DataContext is RecipeManagementViewModel vm)
+                await vm.LoadRecipesCommand.ExecuteAsync(null);
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Failed to load view: {ex.Message}");
+        }
     }
 }

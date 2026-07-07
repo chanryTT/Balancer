@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.Threading;
 using System.Windows;
 using BalanceSystem.Core.Models;
 using BalanceSystem.Core.Services;
@@ -41,6 +42,9 @@ public partial class BalancingTestViewModel : ObservableObject
     private double _leftTrialLeftAmp, _leftTrialLeftPhase, _leftTrialRightAmp, _leftTrialRightPhase;
     private double _rightTrialLeftAmp, _rightTrialLeftPhase, _rightTrialRightAmp, _rightTrialRightPhase;
 
+    // Concurrency guard for OnStepChanged
+    private int _updateInProgress;
+
     public int[] SpeedOptions => Constants.SpeedOptions;
 
     public BalancingTestViewModel(
@@ -79,6 +83,29 @@ public partial class BalancingTestViewModel : ObservableObject
             _testService.RecordCurrentValues(SelectedRecipe);
         else
             _testService.RecordCurrentValues();
+
+        // Stash the recorded values into the step-appropriate fields for TestRecord persistence
+        switch (_testService.CurrentStep)
+        {
+            case TestStep.InitialRun:
+                _initialLeftAmp = _testService.LastLeftAmplitude;
+                _initialLeftPhase = _testService.LastLeftPhase;
+                _initialRightAmp = _testService.LastRightAmplitude;
+                _initialRightPhase = _testService.LastRightPhase;
+                break;
+            case TestStep.LeftTrial:
+                _leftTrialLeftAmp = _testService.LastLeftAmplitude;
+                _leftTrialLeftPhase = _testService.LastLeftPhase;
+                _leftTrialRightAmp = _testService.LastRightAmplitude;
+                _leftTrialRightPhase = _testService.LastRightPhase;
+                break;
+            case TestStep.RightTrial:
+                _rightTrialLeftAmp = _testService.LastLeftAmplitude;
+                _rightTrialLeftPhase = _testService.LastLeftPhase;
+                _rightTrialRightAmp = _testService.LastRightAmplitude;
+                _rightTrialRightPhase = _testService.LastRightPhase;
+                break;
+        }
     }
 
     [RelayCommand]
@@ -108,8 +135,13 @@ public partial class BalancingTestViewModel : ObservableObject
 
     private void OnStepChanged(object? sender, TestStep step)
     {
-        Application.Current.Dispatcher.BeginInvoke(async () =>
+        if (Interlocked.Exchange(ref _updateInProgress, 1) == 1)
+            return; // already processing
+
+        Application.Current.Dispatcher.InvokeAsync(async () =>
         {
+            try
+            {
             CurrentStep = step;
             CanRecord = step is TestStep.InitialRun or TestStep.LeftTrial
                              or TestStep.RightTrial or TestStep.Retest;
@@ -179,6 +211,11 @@ public partial class BalancingTestViewModel : ObservableObject
                     // Don't block the UI — log would help in real app
                     System.Diagnostics.Debug.WriteLine($"Failed to save test record: {ex.Message}");
                 }
+            }
+            }
+            finally
+            {
+                Interlocked.Exchange(ref _updateInProgress, 0);
             }
         });
     }
