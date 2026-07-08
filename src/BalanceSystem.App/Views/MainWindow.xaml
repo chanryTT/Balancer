@@ -68,13 +68,13 @@
             </Border>
             <Grid Grid.Row="1">
                 <views:MonitoringView DataContext="{Binding Monitoring}"
-                    Visibility="{Binding SelectedTabIndex, Converter={StaticResource TabToVisibility}, ConverterParameter=0}"/>
+                    Visibility="{Binding DataContext.SelectedTabIndex, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource TabToVisibility}, ConverterParameter=0}"/>
                 <views:BalancingTestView DataContext="{Binding BalancingTest}"
-                    Visibility="{Binding SelectedTabIndex, Converter={StaticResource TabToVisibility}, ConverterParameter=1}"/>
+                    Visibility="{Binding DataContext.SelectedTabIndex, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource TabToVisibility}, ConverterParameter=1}"/>
                 <views:RecipeManagementView DataContext="{Binding RecipeManagement}"
-                    Visibility="{Binding SelectedTabIndex, Converter={StaticResource TabToVisibility}, ConverterParameter=2}"/>
+                    Visibility="{Binding DataContext.SelectedTabIndex, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource TabToVisibility}, ConverterParameter=2}"/>
                 <views:HistoryView DataContext="{Binding History}"
-                    Visibility="{Binding SelectedTabIndex, Converter={StaticResource TabToVisibility}, ConverterParameter=3}"/>
+                    Visibility="{Binding DataContext.SelectedTabIndex, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource TabToVisibility}, ConverterParameter=3}"/>
             </Grid>
         </Grid>
 

@@ -108,9 +108,8 @@ public class PolarPlotControl : FrameworkElement
         dc.Close();
 
         if (_visuals.Count >= 2)
-            _visuals[1] = _vectorVisual;
-        else
-            _visuals.Add(_vectorVisual);
+            _visuals.RemoveAt(1);
+        _visuals.Add(_vectorVisual);
     }
 
     private static void DrawVectorLine(DrawingContext dc, double cx, double cy,
