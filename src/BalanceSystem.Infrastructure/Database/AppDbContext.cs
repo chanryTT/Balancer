@@ -6,9 +6,11 @@ namespace BalanceSystem.Infrastructure.Database;
 public class AppDbContext
 {
     public IFreeSql Orm { get; set; }
+    public string ConnectionString { get; }
 
     public AppDbContext(string connectionString)
     {
+        ConnectionString = connectionString;
         Orm = new FreeSqlBuilder()
             .UseConnectionString(DataType.SqlServer, connectionString)
             .UseAutoSyncStructure(true)

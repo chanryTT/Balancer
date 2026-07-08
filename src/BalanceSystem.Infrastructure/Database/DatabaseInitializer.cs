@@ -15,7 +15,7 @@ public class DatabaseInitializer
     public DatabaseInitializer(AppDbContext db, ILogger<DatabaseInitializer> logger)
     {
         _db = db;
-        _connectionString = db.Orm.Ado.ConnectionString;
+        _connectionString = db.ConnectionString;
         _logger = logger;
     }
 
